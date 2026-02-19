@@ -1,33 +1,14 @@
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { ArrowRight, GraduationCap, CheckCircle } from 'lucide-react';
+import Hero from '@/components/home/Hero';
 
 export default function Home() {
   return (
     <div className="flex flex-col min-h-screen">
       {/* Hero Section */}
-      <section className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white py-20">
-        <div className="container mx-auto px-4 text-center">
-          <h1 className="text-4xl md:text-6xl font-extrabold mb-6 animate-fade-in-up">
-            Your Future Starts Here
-          </h1>
-          <p className="text-xl md:text-2xl mb-8 max-w-2xl mx-auto opacity-90">
-            Apply for scholarships, track your status, and achieve your dreams with our centralized paperless portal.
-          </p>
-          <div className="flex justify-center space-x-4">
-            <Link href="/register">
-              <Button size="lg" variant="secondary" className="font-semibold px-8 py-6 text-lg">
-                Get Started <ArrowRight className="ml-2 h-5 w-5" />
-              </Button>
-            </Link>
-            <Link href="/scholarships">
-              <Button size="lg" variant="outline" className="bg-transparent border-white text-white hover:bg-white hover:text-indigo-600 font-semibold px-8 py-6 text-lg">
-                Browse Scholarships
-              </Button>
-            </Link>
-          </div>
-        </div>
-      </section>
+      {/* Hero Section */}
+      <Hero />
 
       {/* Features Section */}
       <section className="py-16 bg-gray-50">

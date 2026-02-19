@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Pencil, Trash2, ExternalLink } from 'lucide-react';
+import { Pencil, Trash2, ExternalLink, Loader2 } from 'lucide-react';
 import {
     Dialog,
     DialogContent,
@@ -24,6 +24,7 @@ export default function ApplicationList({ applications }: { applications: any[] 
     const [editingApp, setEditingApp] = useState<any>(null);
     const [documentUrl, setDocumentUrl] = useState('');
     const [loading, setLoading] = useState(false);
+    const [deletingId, setDeletingId] = useState<string | null>(null);
     const [isEditOpen, setIsEditOpen] = useState(false);
     const router = useRouter();
 
@@ -55,6 +56,7 @@ export default function ApplicationList({ applications }: { applications: any[] 
     const handleDelete = async (id: string) => {
         if (!confirm('Are you sure you want to delete this application?')) return;
 
+        setDeletingId(id);
         try {
             const result = await deleteApplication(id);
             if (result.success) {
@@ -65,6 +67,8 @@ export default function ApplicationList({ applications }: { applications: any[] 
             }
         } catch (error) {
             toast.error('Failed to delete application');
+        } finally {
+            setDeletingId(null);
         }
     };
 
@@ -115,11 +119,15 @@ export default function ApplicationList({ applications }: { applications: any[] 
 
                             {app.status === 'Pending' && (
                                 <div className="flex gap-2">
-                                    <Button variant="ghost" size="icon" onClick={() => handleEditClick(app)} title="Edit Application">
+                                    <Button variant="ghost" size="icon" onClick={() => handleEditClick(app)} title="Edit Application" disabled={!!deletingId}>
                                         <Pencil className="h-4 w-4 text-blue-500" />
                                     </Button>
-                                    <Button variant="ghost" size="icon" onClick={() => handleDelete(app._id)} title="Delete Application">
-                                        <Trash2 className="h-4 w-4 text-red-500" />
+                                    <Button variant="ghost" size="icon" onClick={() => handleDelete(app._id)} title="Delete Application" disabled={!!deletingId}>
+                                        {deletingId === app._id ? (
+                                            <Loader2 className="h-4 w-4 animate-spin text-red-500" />
+                                        ) : (
+                                            <Trash2 className="h-4 w-4 text-red-500" />
+                                        )}
                                     </Button>
                                 </div>
                             )}
@@ -151,7 +159,14 @@ export default function ApplicationList({ applications }: { applications: any[] 
                     </div>
                     <DialogFooter>
                         <Button onClick={handleUpdate} disabled={loading}>
-                            {loading ? 'Updating...' : 'Update Application'}
+                            {loading ? (
+                                <>
+                                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                    Updating...
+                                </>
+                            ) : (
+                                'Update Application'
+                            )}
                         </Button>
                     </DialogFooter>
                 </DialogContent>

@@ -23,6 +23,7 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { Textarea } from '../ui/textarea';
 import { useRouter } from 'next/navigation';
+import { Loader2 } from 'lucide-react';
 
 export default function AdminApplications({ applications }: { applications: any[] }) {
     const [selectedApp, setSelectedApp] = useState<any>(null);
@@ -30,16 +31,25 @@ export default function AdminApplications({ applications }: { applications: any[
     const [isOpen, setIsOpen] = useState(false);
     const router = useRouter();
 
+    const [loading, setLoading] = useState(false);
+
     const handleAction = async (status: string) => {
         if (!selectedApp) return;
-        const result = await updateApplicationStatus(selectedApp._id, status, remarks);
-        if (result.success) {
-            toast.success(`Application ${status}`);
-            setIsOpen(false);
-            setRemarks('');
-            router.refresh();
-        } else {
-            toast.error('Failed to update status');
+        setLoading(true);
+        try {
+            const result = await updateApplicationStatus(selectedApp._id, status, remarks);
+            if (result.success) {
+                toast.success(`Application ${status}`);
+                setIsOpen(false);
+                setRemarks('');
+                router.refresh();
+            } else {
+                toast.error('Failed to update status');
+            }
+        } catch (error) {
+            toast.error('Something went wrong');
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -119,8 +129,12 @@ export default function AdminApplications({ applications }: { applications: any[
                         </div>
                     </div>
                     <DialogFooter className="gap-2 sm:gap-0">
-                        <Button variant="destructive" onClick={() => handleAction('Rejected')}>Reject</Button>
-                        <Button onClick={() => handleAction('Approved')}>Approve</Button>
+                        <Button variant="destructive" onClick={() => handleAction('Rejected')} disabled={loading}>
+                            {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Reject'}
+                        </Button>
+                        <Button onClick={() => handleAction('Approved')} disabled={loading}>
+                            {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Approve'}
+                        </Button>
                     </DialogFooter>
                 </DialogContent>
             </Dialog>

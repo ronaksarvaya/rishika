@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react';
+import { Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
     Dialog,
@@ -79,7 +80,14 @@ export default function ScholarshipApplyButton({ scholarship }: { scholarship: a
                 </div>
                 <DialogFooter>
                     <Button type="submit" onClick={handleApply} disabled={loading}>
-                        {loading ? 'Submitting...' : 'Submit Application'}
+                        {loading ? (
+                            <>
+                                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                Submitting...
+                            </>
+                        ) : (
+                            'Submit Application'
+                        )}
                     </Button>
                 </DialogFooter>
             </DialogContent>

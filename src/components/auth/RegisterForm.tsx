@@ -17,6 +17,8 @@ import { registerSchema } from '@/lib/schemas/auth';
 import { registerUser } from '@/actions/user';
 import { toast } from 'sonner';
 import { useRouter } from 'next/navigation';
+import { useState } from 'react';
+import { Loader2 } from 'lucide-react';
 
 export default function RegisterForm() {
     const router = useRouter();
@@ -32,7 +34,10 @@ export default function RegisterForm() {
         },
     });
 
+    const [isLoading, setIsLoading] = useState(false);
+
     async function onSubmit(values: z.infer<typeof registerSchema>) {
+        setIsLoading(true);
         try {
             const result = await registerUser(values);
             if (result.error) {
@@ -43,6 +48,8 @@ export default function RegisterForm() {
             }
         } catch (error) {
             toast.error('Something went wrong. Please try again.');
+        } finally {
+            setIsLoading(false);
         }
     }
 
@@ -56,7 +63,7 @@ export default function RegisterForm() {
                         <FormItem>
                             <FormLabel>Full Name</FormLabel>
                             <FormControl>
-                                <Input placeholder="John Doe" {...field} />
+                                <Input placeholder="John Doe" {...field} disabled={isLoading} />
                             </FormControl>
                             <FormMessage />
                         </FormItem>
@@ -69,7 +76,7 @@ export default function RegisterForm() {
                         <FormItem>
                             <FormLabel>Email</FormLabel>
                             <FormControl>
-                                <Input placeholder="john@example.com" {...field} />
+                                <Input placeholder="john@example.com" {...field} disabled={isLoading} />
                             </FormControl>
                             <FormMessage />
                         </FormItem>
@@ -82,7 +89,7 @@ export default function RegisterForm() {
                         <FormItem>
                             <FormLabel>Password</FormLabel>
                             <FormControl>
-                                <Input type="password" placeholder="******" {...field} />
+                                <Input type="password" placeholder="******" {...field} disabled={isLoading} />
                             </FormControl>
                             <FormMessage />
                         </FormItem>
@@ -98,6 +105,7 @@ export default function RegisterForm() {
                                 <div className="relative">
                                     <select
                                         {...field}
+                                        disabled={isLoading}
                                         className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                                     >
                                         <option value="STUDENT">Student</option>
@@ -110,8 +118,15 @@ export default function RegisterForm() {
                     )}
                 />
 
-                <Button type="submit" className="w-full">
-                    Register
+                <Button type="submit" className="w-full" disabled={isLoading}>
+                    {isLoading ? (
+                        <>
+                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                            Registering...
+                        </>
+                    ) : (
+                        'Register'
+                    )}
                 </Button>
             </form>
         </Form>

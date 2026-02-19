@@ -17,7 +17,8 @@ import { loginSchema } from '@/lib/schemas/auth';
 import { signIn } from 'next-auth/react';
 import { toast } from 'sonner';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useEffect, Suspense } from 'react';
+import { useEffect, Suspense, useState } from 'react';
+import { Loader2 } from 'lucide-react';
 
 function LoginFormContent() {
     const router = useRouter();
@@ -38,7 +39,10 @@ function LoginFormContent() {
         },
     });
 
+    const [isLoading, setIsLoading] = useState(false);
+
     async function onSubmit(values: z.infer<typeof loginSchema>) {
+        setIsLoading(true);
         try {
             const result = await signIn('credentials', {
                 redirect: false,
@@ -48,6 +52,7 @@ function LoginFormContent() {
 
             if (result?.error) {
                 toast.error('Invalid email or password');
+                setIsLoading(false);
             } else {
                 toast.success('Logged in successfully');
                 router.push('/');
@@ -55,6 +60,7 @@ function LoginFormContent() {
             }
         } catch (error) {
             toast.error('Something went wrong');
+            setIsLoading(false);
         }
     }
 
@@ -68,7 +74,7 @@ function LoginFormContent() {
                         <FormItem>
                             <FormLabel>Email</FormLabel>
                             <FormControl>
-                                <Input placeholder="john@example.com" {...field} />
+                                <Input placeholder="john@example.com" {...field} disabled={isLoading} />
                             </FormControl>
                             <FormMessage />
                         </FormItem>
@@ -81,14 +87,21 @@ function LoginFormContent() {
                         <FormItem>
                             <FormLabel>Password</FormLabel>
                             <FormControl>
-                                <Input type="password" placeholder="******" {...field} />
+                                <Input type="password" placeholder="******" {...field} disabled={isLoading} />
                             </FormControl>
                             <FormMessage />
                         </FormItem>
                     )}
                 />
-                <Button type="submit" className="w-full">
-                    Sign In
+                <Button type="submit" className="w-full" disabled={isLoading}>
+                    {isLoading ? (
+                        <>
+                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                            Signing In...
+                        </>
+                    ) : (
+                        'Sign In'
+                    )}
                 </Button>
             </form>
         </Form>

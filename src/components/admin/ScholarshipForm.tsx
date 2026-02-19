@@ -1,5 +1,8 @@
 'use client'
 
+import { useState } from 'react';
+import { Loader2 } from 'lucide-react';
+
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -34,7 +37,10 @@ export default function ScholarshipForm({ onSuccess }: { onSuccess: () => void }
         },
     });
 
+    const [isLoading, setIsLoading] = useState(false);
+
     async function onSubmit(values: z.infer<typeof scholarshipSchema>) {
+        setIsLoading(true);
         try {
             const result = await createScholarship(values);
             if (result.error) {
@@ -47,6 +53,8 @@ export default function ScholarshipForm({ onSuccess }: { onSuccess: () => void }
             }
         } catch (error) {
             toast.error('Something went wrong');
+        } finally {
+            setIsLoading(false);
         }
     }
 
@@ -61,7 +69,7 @@ export default function ScholarshipForm({ onSuccess }: { onSuccess: () => void }
                             <FormItem>
                                 <FormLabel>Scholarship Name</FormLabel>
                                 <FormControl>
-                                    <Input placeholder="Engineering Merit Scholarship" {...field} />
+                                    <Input placeholder="Engineering Merit Scholarship" {...field} disabled={isLoading} />
                                 </FormControl>
                                 <FormMessage />
                             </FormItem>
@@ -74,7 +82,7 @@ export default function ScholarshipForm({ onSuccess }: { onSuccess: () => void }
                             <FormItem>
                                 <FormLabel>Provider</FormLabel>
                                 <FormControl>
-                                    <Input placeholder="Foundation X" {...field} />
+                                    <Input placeholder="Foundation X" {...field} disabled={isLoading} />
                                 </FormControl>
                                 <FormMessage />
                             </FormItem>
@@ -89,7 +97,7 @@ export default function ScholarshipForm({ onSuccess }: { onSuccess: () => void }
                             <FormItem>
                                 <FormLabel>Amount ($)</FormLabel>
                                 <FormControl>
-                                    <Input type="number" {...field} value={field.value as number} onChange={(e) => field.onChange(e.target.valueAsNumber)} />
+                                    <Input type="number" {...field} value={field.value as number} onChange={(e) => field.onChange(e.target.valueAsNumber)} disabled={isLoading} />
                                 </FormControl>
                                 <FormMessage />
                             </FormItem>
@@ -102,7 +110,7 @@ export default function ScholarshipForm({ onSuccess }: { onSuccess: () => void }
                             <FormItem>
                                 <FormLabel>Deadline</FormLabel>
                                 <FormControl>
-                                    <Input type="date" {...field} value={field.value as string} />
+                                    <Input type="date" {...field} value={field.value as string} disabled={isLoading} />
                                 </FormControl>
                                 <FormMessage />
                             </FormItem>
@@ -117,7 +125,7 @@ export default function ScholarshipForm({ onSuccess }: { onSuccess: () => void }
                             <FormItem>
                                 <FormLabel>Category</FormLabel>
                                 <FormControl>
-                                    <Input placeholder="Merit-based" {...field} />
+                                    <Input placeholder="Merit-based" {...field} disabled={isLoading} />
                                 </FormControl>
                                 <FormMessage />
                             </FormItem>
@@ -130,7 +138,7 @@ export default function ScholarshipForm({ onSuccess }: { onSuccess: () => void }
                             <FormItem>
                                 <FormLabel>Eligibility</FormLabel>
                                 <FormControl>
-                                    <Input placeholder="GPA > 3.5" {...field} />
+                                    <Input placeholder="GPA > 3.5" {...field} disabled={isLoading} />
                                 </FormControl>
                                 <FormMessage />
                             </FormItem>
@@ -144,14 +152,21 @@ export default function ScholarshipForm({ onSuccess }: { onSuccess: () => void }
                         <FormItem>
                             <FormLabel>Description</FormLabel>
                             <FormControl>
-                                <Textarea placeholder="Details about specific requirements..." className="min-h-[100px]" {...field} />
+                                <Textarea placeholder="Details about specific requirements..." className="min-h-[100px]" {...field} disabled={isLoading} />
                             </FormControl>
                             <FormMessage />
                         </FormItem>
                     )}
                 />
-                <Button type="submit" className="w-full">
-                    Create Scholarship
+                <Button type="submit" className="w-full" disabled={isLoading}>
+                    {isLoading ? (
+                        <>
+                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                            Creating...
+                        </>
+                    ) : (
+                        'Create Scholarship'
+                    )}
                 </Button>
             </form>
         </Form>
